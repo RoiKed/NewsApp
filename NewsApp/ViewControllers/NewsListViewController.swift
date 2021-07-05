@@ -19,6 +19,7 @@ class NewsListViewController: UIViewController {
     
     private var articleListVM = ArticleListViewModel(nil)
     private var lastItemIndex = 0
+    var allowPaging = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -55,6 +56,7 @@ class NewsListViewController: UIViewController {
     }
     
     @objc private func search() {
+        self.allowPaging = true
         searchBarSearchButtonClicked(self.searchBar)
     }
     
@@ -69,7 +71,7 @@ class NewsListViewController: UIViewController {
     
     private func loadContent(isFirstLoad: Bool) {
         self.spinner.startAnimating()
-        WebService.shared.getArticles(isFirstLoad: isFirstLoad) { [weak self] articles, error in
+        WebService.shared.getArticles(isFirstLoad: isFirstLoad) { [weak self] articles, responce,error in
             if let error = error {
                 print(error.localizedDescription)
                 DispatchQueue.main.async {
@@ -77,8 +79,12 @@ class NewsListViewController: UIViewController {
                     return
                 }
             }
+            guard let responce = responce as? HTTPURLResponse else { return }
             if let articles = articles {
                 self?.articleListVM.articles.append(contentsOf: articles)
+                if articles.count < 22 || responce.statusCode == 404 {
+                    self?.allowPaging = false
+                }
             }
             DispatchQueue.main.async {
                 self?.tableView.reloadData()
@@ -94,7 +100,7 @@ extension NewsListViewController: UISearchBarDelegate {
         if let searchString = searchBar.text, searchString.isEmpty == false {
             self.articleListVM.articles.removeAll()
             self.spinner.startAnimating()
-            WebService.shared.getArticles(for: searchString, isFirstLoad: true) { [weak self] articles, error in
+            WebService.shared.getArticles(for: searchString, isFirstLoad: true) { [weak self] articles, responce, error in
                 if let error = error {
                     print(error.localizedDescription)
                     DispatchQueue.main.async {
@@ -102,12 +108,21 @@ extension NewsListViewController: UISearchBarDelegate {
                         return
                     }
                 }
+                guard let response = responce as? HTTPURLResponse else { return }
+                    
                 if let articles = articles {
+                    if articles.count < 22 || response.statusCode == 404 {
+                        self?.allowPaging = false
+                    }
                     self?.articleListVM.articles.append(contentsOf: articles)
                 }
                 DispatchQueue.main.async {
                     self?.tableView.reloadData()
                     self?.spinner.stopAnimating()
+                    if let numberOfItems = self?.articleListVM.articles.count, numberOfItems > 0 {
+                        let firstIndex = IndexPath(row: 0, section: 0)
+                        self?.tableView.scrollToRow(at:firstIndex , at: .top, animated: true)
+                    }
                 }
             }
         }
@@ -182,7 +197,7 @@ extension NewsListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if didScrollToLastItem(scrollView) {
+        if didScrollToLastItem(scrollView) && allowPaging == true {
             loadContent(isFirstLoad: false)
         }
     }
