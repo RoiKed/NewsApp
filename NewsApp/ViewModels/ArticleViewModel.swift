@@ -61,6 +61,7 @@ struct ArticleListViewModel {
         } else {
             self.articles = [Article]()
         }
+        
     }
     
     var numberOfSections = 1
@@ -73,4 +74,15 @@ struct ArticleListViewModel {
         let retVal = ArticleViewModel(articles[index])
         return retVal
     }
+    
+//    func getUpdatedArticleList() -> [Article] {
+//        var mutableArticles = articles
+//        for i in 0 ..< mutableArticles.count {
+//            if i % 10 == 2 {
+//                let emptyArticle = Article.init(title: "", date: "", link: "", description: "", author: Author.init(name: "", image: Image.init(src: nil)), image: Image.init(src: nil))
+//                mutableArticles.insert(emptyArticle, at: i)
+//            }
+//        }
+//        return articles
+//    }
 }

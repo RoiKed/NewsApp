@@ -37,6 +37,7 @@ class NewsListViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UINib(nibName: "NewsCell", bundle: nil), forCellReuseIdentifier: "newsCell")
+        tableView.register(UINib(nibName: "promotionCell", bundle: nil), forCellReuseIdentifier: "promotionCell")
         tableView.separatorStyle = .none
         loadContent(isFirstLoad: true)
     }
@@ -128,19 +129,27 @@ extension NewsListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell", for: indexPath) as? NewsCell else {
-            fatalError("News cell not found")
+        if isPromotionCell(indexPath.row) {
+            guard let promotionCell = tableView.dequeueReusableCell(withIdentifier: "promotionCell", for: indexPath) as? promotionCell else {
+                fatalError("News cell not found")
+            }
+            return promotionCell
+        } else {
+            guard let newsCell = tableView.dequeueReusableCell(withIdentifier: "newsCell", for: indexPath) as? NewsCell else {
+                fatalError("News cell not found")
+            }
+            if indexPath.row > lastItemIndex {
+                lastItemIndex = indexPath.row
+            }
+            let articleViewModel = articleListVM.articleAtIndex(indexPath.row)
+            newsCell.update(articleViewModel.title, articleViewModel.subTitle, articleViewModel.articleImageUrl, articleViewModel.authorImageUrl, articleViewModel.date, articleViewModel.authorName)
+            return newsCell
         }
-        if indexPath.row > lastItemIndex {
-            lastItemIndex = indexPath.row
-        }
-        let articleViewModel = articleListVM.articleAtIndex(indexPath.row)
-        cell.update(articleViewModel.title, articleViewModel.subTitle, articleViewModel.articleImageUrl, articleViewModel.authorImageUrl, articleViewModel.date, articleViewModel.authorName)
-        return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 400
+        let height: CGFloat = isPromotionCell(indexPath.row) ? 100: 400
+        return height
     }
     
     /* since articles starts at index number 0 and
@@ -151,14 +160,25 @@ extension NewsListViewController: UITableViewDelegate, UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("selected cell at index \(indexPath.row)")
-        if let url = URL(string: self.articleListVM.articles[indexPath.row].link) {
-            let config = SFSafariViewController.Configuration()
-            config.entersReaderIfAvailable = true
-            config.barCollapsingEnabled = true
-            let safariViewController = SFSafariViewController(url: url, configuration: config)
-            self.navigationController?.present(safariViewController, animated: true)
+        if isPromotionCell(indexPath.row) {
+            //open the url in the device's web browser
+            guard let cell = tableView.cellForRow(at: indexPath) as? promotionCell,
+                  let url = cell.link else { return }
+            if UIApplication.shared.canOpenURL(url) {
+                UIApplication.shared.open(url)
+            }
+        } else {
+            print("selected cell at index \(indexPath.row)")
+            //open the url internally on a new webViewController
+            if let url = URL(string: self.articleListVM.articles[indexPath.row].link) {
+                let config = SFSafariViewController.Configuration()
+                config.entersReaderIfAvailable = true
+                config.barCollapsingEnabled = true
+                let safariViewController = SFSafariViewController(url: url, configuration: config)
+                self.navigationController?.present(safariViewController, animated: true)
+            }
         }
+        
     }
     
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
