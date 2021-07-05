@@ -17,8 +17,9 @@ class NewsListViewController: UIViewController {
     @IBOutlet weak var spinner: UIActivityIndicatorView!
     @IBOutlet weak var searchBar: UISearchBar!
     
-    private var articleListVM = ArticleListViewModel(nil)
-    private var lastItemIndex = 0
+    var articleListVM = ArticleListViewModel(nil)
+    var lastItemIndex = 0
+    var allowPaging = true
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -28,8 +29,8 @@ class NewsListViewController: UIViewController {
     // MARK: - Private Methods
     
     private func setup() {
-        setupTable()
         setupSpinner()
+        setupTable()
         setupSearchBar()
     }
     
@@ -37,6 +38,7 @@ class NewsListViewController: UIViewController {
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UINib(nibName: "NewsCell", bundle: nil), forCellReuseIdentifier: "newsCell")
+        tableView.register(UINib(nibName: "promotionCell", bundle: nil), forCellReuseIdentifier: "promotionCell")
         tableView.separatorStyle = .none
         loadContent(isFirstLoad: true)
     }
@@ -54,6 +56,7 @@ class NewsListViewController: UIViewController {
     }
     
     @objc private func search() {
+        self.allowPaging = true
         searchBarSearchButtonClicked(self.searchBar)
     }
     
@@ -66,9 +69,9 @@ class NewsListViewController: UIViewController {
         spinner.stopAnimating()
     }
     
-    private func loadContent(isFirstLoad: Bool) {
+    internal func loadContent(isFirstLoad: Bool) {
         self.spinner.startAnimating()
-        WebService.shared.getArticles(isFirstLoad: isFirstLoad) { [weak self] articles, error in
+        WebService.shared.getArticles(isFirstLoad: isFirstLoad) { [weak self] articles, responce,error in
             if let error = error {
                 print(error.localizedDescription)
                 DispatchQueue.main.async {
@@ -76,8 +79,12 @@ class NewsListViewController: UIViewController {
                     return
                 }
             }
+            guard let responce = responce as? HTTPURLResponse else { return }
             if let articles = articles {
                 self?.articleListVM.articles.append(contentsOf: articles)
+                if articles.count < 22 || responce.statusCode == 404 {
+                    self?.allowPaging = false
+                }
             }
             DispatchQueue.main.async {
                 self?.tableView.reloadData()
@@ -87,90 +94,3 @@ class NewsListViewController: UIViewController {
     }
 }
 
-extension NewsListViewController: UISearchBarDelegate {
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        if let searchString = searchBar.text, searchString.isEmpty == false {
-            self.articleListVM.articles.removeAll()
-            self.spinner.startAnimating()
-            WebService.shared.getArticles(for: searchString, isFirstLoad: true) { [weak self] articles, error in
-                if let error = error {
-                    print(error.localizedDescription)
-                    DispatchQueue.main.async {
-                        self?.spinner.stopAnimating()
-                        return
-                    }
-                }
-                if let articles = articles {
-                    self?.articleListVM.articles.append(contentsOf: articles)
-                }
-                DispatchQueue.main.async {
-                    self?.tableView.reloadData()
-                    self?.spinner.stopAnimating()
-                }
-            }
-        }
-    }
-}
-
-extension NewsListViewController: UITableViewDelegate, UITableViewDataSource {
-    
-    // MARK: - delegate methods
-    
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return articleListVM.numberOfSections
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        var numberOfRows = 0
-        numberOfRows = articleListVM.numberOfRowsInSection(section: section)
-        return numberOfRows
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: "newsCell", for: indexPath) as? NewsCell else {
-            fatalError("News cell not found")
-        }
-        if indexPath.row > lastItemIndex {
-            lastItemIndex = indexPath.row
-        }
-        let articleViewModel = articleListVM.articleAtIndex(indexPath.row)
-        cell.update(articleViewModel.title, articleViewModel.subTitle, articleViewModel.articleImageUrl, articleViewModel.authorImageUrl, articleViewModel.date, articleViewModel.authorName)
-        return cell
-    }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 400
-    }
-    
-    /* since articles starts at index number 0 and
-     every 3rd 13th.. 23rd .. cells are promotion we check for % 10
-     */
-    func isPromotionCell(_ index: Int) -> Bool {
-        return  index % 10 == 2
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("selected cell at index \(indexPath.row)")
-        if let url = URL(string: self.articleListVM.articles[indexPath.row].link) {
-            let config = SFSafariViewController.Configuration()
-            config.entersReaderIfAvailable = true
-            config.barCollapsingEnabled = true
-            let safariViewController = SFSafariViewController(url: url, configuration: config)
-            self.navigationController?.present(safariViewController, animated: true)
-        }
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        if didScrollToLastItem(scrollView) {
-            loadContent(isFirstLoad: false)
-        }
-    }
-    
-    private func didScrollToLastItem(_ scrollView: UIScrollView) -> Bool {
-        let height = scrollView.frame.size.height
-        let contentYoffset = scrollView.contentOffset.y
-        let distanceFromBottom = scrollView.contentSize.height - contentYoffset
-        return distanceFromBottom < height
-    }
-}
