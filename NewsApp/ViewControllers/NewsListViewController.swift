@@ -29,8 +29,8 @@ class NewsListViewController: UIViewController {
     // MARK: - Private Methods
     
     private func setup() {
-        setupTable()
         setupSpinner()
+        setupTable()
         setupSearchBar()
     }
     
