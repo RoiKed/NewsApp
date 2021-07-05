@@ -58,13 +58,13 @@ class WebService {
         }
     }
     
-    func getArticles(for search: String, isFirstLoad: Bool, completion: @escaping ([Article]?, URLResponse?, Error?) -> ()) {
+    func getArticles(for search: String, isFirstLoad: Bool, completion: @escaping ([Article]?, Error?) -> ()) {
         addSearchPhrase(search)
         updatePageNumber(shouldReset: true)
         getArticles(isFirstLoad: isFirstLoad, completion: completion)
     }
     
-    func getArticles(isFirstLoad: Bool, completion: @escaping ([Article]?, URLResponse?,  Error?) -> ()) {
+    func getArticles(isFirstLoad: Bool, completion: @escaping ([Article]?, Error?) -> ()) {
         if isFirstLoad == false {
             updatePageNumber(shouldReset: false)
         }
@@ -72,21 +72,21 @@ class WebService {
             URLSession.shared.dataTask(with: url) { data, response, error in
                 if let error = error {
                     print(error.localizedDescription)
-                    completion(nil,nil,error)
+                    completion(nil,error)
                     return
                 }
                 guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
-                    completion(nil, response, NetworkManagerError.badResponse(response))
+                    completion(nil, NetworkManagerError.badResponse(response))
                     return
                 }
                 if let data = data {
                     //parsing the data
                     let articleList = try?  JSONDecoder().decode(ArticleList.self, from: data)
                     if let articleList = articleList {
-                        let articles = self.getUpdatedArticleList(articles: articleList.data)
-                        completion(articles, response, nil)
+                        let articles = articleList.data
+                        completion(articles,nil)
                     } else {
-                        completion(nil, response, NetworkManagerError.parsingFailed)
+                        completion(nil,NetworkManagerError.parsingFailed)
                     }
                 }
             }.resume()
@@ -96,6 +96,7 @@ class WebService {
     func getImageFromUrl(_ url: URL, completion: @escaping (Data?, Error?) -> ()) {
         //check first if exist in cache
         if let imageData = images.object(forKey: url.absoluteString as NSString) {
+//              print("using cached images")
               completion(imageData as Data, nil)
               return
         }
@@ -118,6 +119,7 @@ class WebService {
             do {
                 let data = try Data(contentsOf: localUrl)
                 self.images.setObject(data as NSData, forKey: url.absoluteString as NSString)
+//                print("downloaded new image")
                 completion(data, nil)
             } catch let error {
                 completion(nil, error)
@@ -125,15 +127,59 @@ class WebService {
             }.resume()
         }
     
-    private func getUpdatedArticleList(articles: [Article]) -> [Article] {
-        var mutableArticles = articles
-        for i in 0 ..< mutableArticles.count {
-            if i % 10 == 2 {
-                let emptyArticle = Article.init(title: "", date: "", link: "", description: "", author: Author.init(name: "", image: Image.init(src: nil)), image: Image.init(src: nil))
-                mutableArticles.insert(emptyArticle, at: i)
-            }
-        }
-        return mutableArticles
-    }
-    
+//    struct ArticleDummy : Decodable {
+//        let title: String
+//        let date: String
+//        let link: String
+//        let description: String
+//        let author: AuthorDummy
+//        let image: Image
+//    }
+//
+//    struct ArticleListDummy : Decodable {
+//        let data: [ArticleDummy]
+//    }
+//
+//    struct AuthorDummy: Decodable {
+//        let name: String
+//        let image: AuthorImageDummy
+//    }
+//
+//    struct ImageDummy: Decodable {
+//        let src: String
+//    }
+//
+//    struct AuthorImageDummy: Decodable {
+//        let src: String
+//    }
+//
+//
+//    func getArticles2(isFirstLoad: Bool, completion: @escaping ([ArticleDummy]?, Error?) -> ()) {
+//        if isFirstLoad == false {
+//            updatePageNumber(shouldReset: false)
+//        }
+//        if let url = tipRanksUrlComponents.url {
+//            URLSession.shared.dataTask(with: url) { data, response, error in
+//                if let error = error {
+//                    print(error.localizedDescription)
+//                    completion(nil,error)
+//                    return
+//                }
+//                guard let httpResponse = response as? HTTPURLResponse, (200...299).contains(httpResponse.statusCode) else {
+//                    completion(nil, NetworkManagerError.badResponse(response))
+//                    return
+//                }
+//                if let data = data {
+//                    //parsing the data
+//                    let articleList = try?  JSONDecoder().decode(ArticleListDummy.self, from: data)
+//                    if let articleList = articleList {
+//                        let articles = articleList.data
+//                        completion(articles,nil)
+//                    } else {
+//                        completion(nil,NetworkManagerError.parsingFailed)
+//                    }
+//                }
+//            }.resume()
+//        }
+//    }
 }

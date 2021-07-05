@@ -174,8 +174,8 @@
             filePath = "NewsApp/ViewControllers/NewsListViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "71"
-            endingLineNumber = "71"
+            startingLineNumber = "70"
+            endingLineNumber = "70"
             landmarkName = "loadContent(isFirstLoad:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -190,42 +190,58 @@
             filePath = "NewsApp/ViewControllers/NewsListViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "97"
-            endingLineNumber = "97"
+            startingLineNumber = "96"
+            endingLineNumber = "96"
             landmarkName = "searchBarSearchButtonClicked(_:)"
             landmarkType = "7">
             <Locations>
                <Location
-                  uuid = "40771739-5780-4280-8DBF-8C906C833F05 - da05162e7cfa8ca8"
+                  uuid = "40771739-5780-4280-8DBF-8C906C833F05 - c6210950c366c62a"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "NewsApp.NewsListViewController.searchBarSearchButtonClicked(__C.UISearchBar) -&gt; ()"
                   moduleName = "NewsApp"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/roikedarya/Desktop/NewsApp/NewsApp/ViewControllers/NewsListViewController.swift"
+                  urlString = "file:///Users/roikedarya/Desktop/Job%20Interview%20Tasks/NewsApp/NewsApp/ViewControllers/NewsListViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "98"
-                  endingLineNumber = "98"
+                  startingLineNumber = "95"
+                  endingLineNumber = "95"
                   offsetFromSymbolStart = "685">
                </Location>
                <Location
-                  uuid = "40771739-5780-4280-8DBF-8C906C833F05 - 8f886c415e75b562"
+                  uuid = "40771739-5780-4280-8DBF-8C906C833F05 - 93ac733fe1e9ffe0"
                   shouldBeEnabled = "Yes"
                   ignoreCount = "0"
                   continueAfterRunningActions = "No"
                   symbolName = "closure #1 (Swift.Optional&lt;Swift.Array&lt;NewsApp.Article&gt;&gt;, Swift.Optional&lt;Swift.Error&gt;) -&gt; () in NewsApp.NewsListViewController.searchBarSearchButtonClicked(__C.UISearchBar) -&gt; ()"
                   moduleName = "NewsApp"
                   usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/roikedarya/Desktop/NewsApp/NewsApp/ViewControllers/NewsListViewController.swift"
+                  urlString = "file:///Users/roikedarya/Desktop/Job%20Interview%20Tasks/NewsApp/NewsApp/ViewControllers/NewsListViewController.swift"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "98"
-                  endingLineNumber = "98"
+                  startingLineNumber = "95"
+                  endingLineNumber = "95"
                   offsetFromSymbolStart = "224">
                </Location>
             </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "2784C1CF-E11E-47DE-9585-8BB3ED7C5EA4"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "NewsApp/Services/WebService.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "175"
+            endingLineNumber = "175"
+            landmarkName = "WebService"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -241,38 +257,6 @@
             startingLineNumber = "89"
             endingLineNumber = "89"
             landmarkName = "getArticles(isFirstLoad:completion:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "91E3F925-7B1C-4E9C-814C-E78742085F16"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "NewsApp/ViewControllers/NewsListViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "165"
-            endingLineNumber = "165"
-            landmarkName = "tableView(_:didSelectRowAt:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "3FADC6C3-42F9-446F-B942-5A4D70900B1D"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "NewsApp/ViewModels/ArticleViewModel.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "58"
-            endingLineNumber = "58"
-            landmarkName = "init(_:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

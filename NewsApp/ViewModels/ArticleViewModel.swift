@@ -61,7 +61,6 @@ struct ArticleListViewModel {
         } else {
             self.articles = [Article]()
         }
-        
     }
     
     var numberOfSections = 1
