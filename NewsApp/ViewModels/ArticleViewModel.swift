@@ -54,7 +54,11 @@ extension ArticleViewModel {
 
 struct ArticleListViewModel {
     var articles: [Article]
-    
+    var updatedArticles: [Article] {
+        get {
+            return getUpdatedArticleList(articles: articles)
+        }
+    }
     init(_ articles: [Article]?) {
         if let articles = articles {
             self.articles = articles
@@ -71,7 +75,18 @@ struct ArticleListViewModel {
     }
     
     func articleAtIndex(_ index: Int) -> ArticleViewModel {
-        let retVal = ArticleViewModel(articles[index])
+        let retVal = ArticleViewModel(updatedArticles[index])
         return retVal
+    }
+    
+    func getUpdatedArticleList(articles: [Article]) -> [Article] {
+        var mutableArticles = articles
+        for i in 0 ..< mutableArticles.count {
+            if i % 10 == 2 {
+                let emptyArticle = Article.init(title: "", date: "", link: "", description: "", author: Author.init(name: "", image: Image.init(src: nil)), image: Image.init(src: nil))
+                mutableArticles.insert(emptyArticle, at: i)
+            }
+        }
+        return mutableArticles
     }
 }

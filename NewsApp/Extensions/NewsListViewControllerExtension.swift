@@ -68,9 +68,6 @@ extension NewsListViewController: UITableViewDelegate, UITableViewDataSource {
             guard let newsCell = tableView.dequeueReusableCell(withIdentifier: "newsCell", for: indexPath) as? NewsCell else {
                 fatalError("News cell not found")
             }
-            if indexPath.row > lastItemIndex {
-                lastItemIndex = indexPath.row
-            }
             let articleViewModel = articleListVM.articleAtIndex(indexPath.row)
             newsCell.update(articleViewModel.title, articleViewModel.subTitle, articleViewModel.articleImageUrl, articleViewModel.authorImageUrl, articleViewModel.date, articleViewModel.authorName)
             return newsCell
@@ -100,7 +97,7 @@ extension NewsListViewController: UITableViewDelegate, UITableViewDataSource {
         } else {
             print("selected cell at index \(indexPath.row)")
             //open the url internally on a new webViewController
-            if let url = URL(string: self.articleListVM.articles[indexPath.row].link) {
+            if let url = URL(string: self.articleListVM.updatedArticles[indexPath.row].link) {
                 let config = SFSafariViewController.Configuration()
                 config.entersReaderIfAvailable = true
                 config.barCollapsingEnabled = true

@@ -18,7 +18,6 @@ class NewsListViewController: UIViewController {
     @IBOutlet weak var searchBar: UISearchBar!
     
     var articleListVM = ArticleListViewModel(nil)
-    var lastItemIndex = 0
     var allowPaging = true
     
     override func viewDidLoad() {
@@ -82,7 +81,8 @@ class NewsListViewController: UIViewController {
             guard let responce = responce as? HTTPURLResponse else { return }
             if let articles = articles {
                 self?.articleListVM.articles.append(contentsOf: articles)
-                if articles.count < 22 || responce.statusCode == 404 {
+                let numberOfItemsPerPage = WebService.shared.numberOfItemsPerPage
+                if articles.count < numberOfItemsPerPage || responce.statusCode == 404 {
                     self?.allowPaging = false
                 }
             }

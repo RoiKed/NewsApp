@@ -18,14 +18,14 @@ enum NetworkManagerError: Error {
 class WebService {
     
     private var images = NSCache<NSString, NSData>()
-    
+    public let numberOfItemsPerPage = 20
     private lazy var tipRanksUrlComponents: URLComponents = {
         var components = URLComponents()
         components.scheme = "https"
         components.host = "www.tipranks.com"
         components.path = "/api/news/posts"
         components.queryItems = [
-                URLQueryItem(name: "per_page", value: "20"),
+                URLQueryItem(name: "per_page", value: String(numberOfItemsPerPage)),
                 URLQueryItem(name: "page", value: "1")
             ]
         return components
@@ -83,8 +83,7 @@ class WebService {
                     //parsing the data
                     let articleList = try?  JSONDecoder().decode(ArticleList.self, from: data)
                     if let articleList = articleList {
-                        let articles = self.getUpdatedArticleList(articles: articleList.data)
-                        completion(articles, response, nil)
+                        completion(articleList.data, response, nil)
                     } else {
                         completion(nil, response, NetworkManagerError.parsingFailed)
                     }
@@ -124,16 +123,4 @@ class WebService {
               }
             }.resume()
         }
-    
-    private func getUpdatedArticleList(articles: [Article]) -> [Article] {
-        var mutableArticles = articles
-        for i in 0 ..< mutableArticles.count {
-            if i % 10 == 2 {
-                let emptyArticle = Article.init(title: "", date: "", link: "", description: "", author: Author.init(name: "", image: Image.init(src: nil)), image: Image.init(src: nil))
-                mutableArticles.insert(emptyArticle, at: i)
-            }
-        }
-        return mutableArticles
-    }
-    
 }
